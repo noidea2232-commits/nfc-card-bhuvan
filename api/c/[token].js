@@ -4,16 +4,22 @@
 
 // Vercel serverless functions do NOT have access to VITE_ prefixed env vars at runtime.
 // Use non-prefixed env vars set in Vercel Dashboard, or fallback to hardcoded values.
-const SUPABASE_URL =
-  process.env.SUPABASE_URL ||
-  process.env.VITE_SUPABASE_URL ||
-  'https://ybrhzwsquyzpnzwyvang.supabase.co';
+// Filter out any legacy/dead Supabase project URLs from old environment variables
+function getActiveSupabaseConfig() {
+  const envUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const isDeadUrl = !envUrl || envUrl.includes('hqabqueltgyhvcxxqebj');
+  const supabaseUrl = isDeadUrl ? 'https://ybrhzwsquyzpnzwyvang.supabase.co' : envUrl;
 
-const SUPABASE_API_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlicmh6d3NxdXl6cG56d3l2YW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMzA5NjAsImV4cCI6MjEwNjcwNjk2MH0.W3F0fEx0umofiXI-zZV8wugWaHXnR3aVZSOYNvvHssE';
+  const envKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+  const isDeadKey = !envKey || envKey.includes('hqabqueltgyhvcxxqebj') || isDeadUrl;
+  const supabaseKey = isDeadKey
+    ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlicmh6d3NxdXl6cG56d3l2YW5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExMzA5NjAsImV4cCI6MjEwNjcwNjk2MH0.W3F0fEx0umofiXI-zZV8wugWaHXnR3aVZSOYNvvHssE'
+    : envKey;
+
+  return { supabaseUrl, supabaseKey };
+}
+
+const { supabaseUrl: SUPABASE_URL, supabaseKey: SUPABASE_API_KEY } = getActiveSupabaseConfig();
 
 function renderHtmlErrorPage(title, message, detail, statusCode = 404) {
   const html = `<!DOCTYPE html>
