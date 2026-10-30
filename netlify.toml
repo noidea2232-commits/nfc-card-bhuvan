@@ -2,13 +2,11 @@
   publish = "dist"
   command = "npm run build"
 
-# Dynamic Card Resolver - Proxies /c/:token to the Supabase Edge Function.
-# Using status 200 (rewrite) so Netlify fetches the Edge Function response transparently.
-# The Edge Function itself returns an HTTP 302 to the client, which the browser follows.
+# Dynamic Card Resolver - Proxies /c/:token to Vercel Serverless API
 [[redirects]]
   from = "/c/:token"
-  to = "https://hqabqueltgyhvcxxqebj.supabase.co/functions/v1/c/:token"
-  status = 200
+  to = "https://nfc-card-bhuvan.vercel.app/c/:token"
+  status = 302
   force = true
 
 # Single Page Application (SPA) catch-all routing
